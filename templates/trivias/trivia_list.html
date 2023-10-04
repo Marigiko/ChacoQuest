@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container">
+    <h1 class="my-4">Listado de Trivias</h1>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for trivia in trivias %}
+          <tr>
+            <td>{{ trivia.titulo }}</td>
+            <td>
+              <a href="{% url 'trivia-detail' trivia.id %}" class="btn btn-info btn-sm">Ver Detalles</a>
+              <a href="{% url 'trivia-update' trivia.id %}" class="btn btn-warning btn-sm">Editar</a>
+              <a href="{% url 'trivia-delete' trivia.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="2">No hay trivias disponibles.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="{% url 'trivia-create' %}" class="btn btn-primary">Crear Trivia</a>
+  </div>
+{% endblock %}

@@ -4,7 +4,8 @@
     "pk": 1,
     "fields": {
                 "texto": "Resistencia es conocida como:",
-                "categoria": 2
+                "categoria": 2,
+                "fecha_publicacion": "2022-05-07"
     }
   },
 
@@ -13,7 +14,8 @@
     "pk": 2,
     "fields": {
                 "texto": "¿Cuántas esculturas hay en Resistencia?:",
-                "categoria": 2
+                "categoria": 2,
+                "fecha_publicacion": "2023-03-03"
     }
   },
 
@@ -22,7 +24,8 @@
     "pk": 3,
     "fields": {
                 "texto": "¿En qué sectores se divide geográficamente la provincia del Chaco?",
-                "categoria": 7
+                "categoria": 7,
+                "fecha_publicacion": "2022-02-02"
     }
   }
 ]

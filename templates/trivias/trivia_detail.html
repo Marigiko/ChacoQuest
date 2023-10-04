@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h1>Detalle de Trivia</h1>
+    <p>Aquí puedes ver los detalles de la trivia:</p>
+    
+    <table class="table table-bordered">
+      <tr>
+        <th>Título</th>
+        <td>{{ trivia.titulo }}</td>
+      </tr>
+      <tr>
+        <th>Nivel</th>
+        <td>{{ trivia.nivel }}</td>
+      </tr>
+      <tr>
+        <th>Fecha de Publicación</th>
+        <td>{{ trivia.fecha }}</td>
+      </tr>
+      <!-- Agrega más detalles de la trivia según tus necesidades -->
+    </table>
+    
+    <a href="{% url 'trivia-list' %}" class="btn btn-primary">Volver a la lista de trivias</a>
+  </div>
+{% endblock %}
