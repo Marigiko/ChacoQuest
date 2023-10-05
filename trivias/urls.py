@@ -16,5 +16,10 @@ urlpatterns = [
 
     # Ruta para eliminar una trivia existente
     path('trivias/<int:pk>/delete/', views.TriviaDeleteView.as_view(), name='trivia-delete'),
+    
+    # Ruta para jugar a una trivia existente
+    path('jugar-trivia/', views.JugarTriviaView.as_view(), name='jugar-trivia'),
+    
+    path('obtener_preguntas_respuestas/<int:trivia_id>/', views.obtener_preguntas_respuestas, name='obtener_preguntas_respuestas'),
 ]
 

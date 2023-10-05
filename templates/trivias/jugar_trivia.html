@@ -1,0 +1,255 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-5">
+  <h1>Jugar Trivia</h1>
+  {% if trivias_disponibles %}
+  <div id="trivia-start-block" class="alert alert-info">
+    <p>Selecciona una trivia para comenzar:</p>
+    <form id="trivia-form" method="post">
+      {% csrf_token %}
+      <select name="trivia_id" id="trivia-select" class="form-select">
+        {% for trivia in trivias_disponibles %}
+        <option value="{{ trivia.pk }}">{{ trivia.titulo }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" name="comenzar" class="btn btn-primary mt-3">
+        Comenzar
+      </button>
+    </form>
+  </div>
+  {% endif %}
+
+  <div id="question-alert" style="display: none">
+    Pregunta:
+    <span id="question-text">Aquí aparecerá la pregunta</span>
+  </div>
+
+  <div id="answers" style="display: none">
+    <!-- Las respuestas se agregarán aquí dinámicamente -->
+  </div>
+
+  <div id="result" class="mt-3" style="display: none">
+    <!-- El resultado de la respuesta se mostrará aquí -->
+  </div>
+
+  <button id="check-answer" class="btn btn-primary mt-3" style="display: none">
+    Comprobar Respuesta
+  </button>
+  <button id="next-question" class="btn btn-primary mt-3" style="display: none">
+    Siguiente Pregunta
+  </button>
+  <div id="success-animation" style="display: none">
+    <!-- Aquí coloca la animación de éxito (por ejemplo, un ícono o mensaje) -->
+    Respuesta Correcta
+  </div>
+  <div id="failure-animation" style="display: none">
+    <!-- Aquí coloca la animación de fallo (por ejemplo, un ícono o mensaje) -->
+    Respuesta Incorrecta
+  </div>
+</div>
+
+<style>
+  /* Define la animación de éxito */
+  @keyframes successAnimation {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Define la animación de fallo */
+  @keyframes failureAnimation {
+    0% {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Estilos para los bloques de animación */
+  #success-animation,
+  #failure-animation {
+    animation-duration: 1s;
+    animation-fill-mode: both;
+    display: none;
+    font-size: 24px;
+    padding: 10px;
+    text-align: center;
+  }
+
+  /* Estilos específicos para la animación de éxito */
+  #success-animation {
+    background-color: #4caf50; /* Verde */
+    color: white;
+  }
+
+  /* Estilos específicos para la animación de fallo */
+  #failure-animation {
+    background-color: #f44336; /* Rojo */
+    color: white;
+  }
+</style>
+
+<script>
+  var triviaData = [];
+  var currentQuestionIndex = 0;
+  var puntaje = 0; // Inicializa el puntaje en 0
+
+  function loadQuestion(index) {
+    document.getElementById("success-animation").style.display = "none";
+    document.getElementById("failure-animation").style.display = "none";
+
+    if (index < triviaData.length) {
+      var questionData = triviaData[index];
+      var questionText = questionData.pregunta;
+      var answers = questionData.respuestas;
+      var answersHtml = "";
+
+      for (var i = 0; i < answers.length; i++) {
+        answersHtml += '<div class="form-check">';
+        answersHtml +=
+          '<input class="form-check-input" type="radio" name="respuesta" value="' +
+          i +
+          '" id="respuesta' +
+          i +
+          '">';
+        answersHtml +=
+          '<label class="form-check-label" for="respuesta' +
+          i +
+          '">' +
+          answers[i].texto +
+          "</label>";
+        answersHtml += "</div>";
+      }
+
+      document.getElementById("question-text").textContent = questionText;
+      document.getElementById("answers").innerHTML = answersHtml;
+    } else {
+      document.getElementById("question-alert").textContent =
+        "¡Trivia completada!";
+      document.getElementById("answers").innerHTML = "";
+      document.getElementById("result").innerHTML =
+        '<div class="alert alert-info">Puntaje: ' +
+        puntaje + // Muestra el puntaje obtenido
+        "/" +
+        triviaData.length +
+        "</div>";
+      document.getElementById("check-answer").style.display = "none";
+      document.getElementById("next-question").style.display = "none";
+    }
+  }
+
+  function checkAnswer() {
+    // Bloquea la selección de respuestas
+    var answerInputs = document.querySelectorAll('input[name="respuesta"]');
+    for (var i = 0; i < answerInputs.length; i++) {
+      answerInputs[i].disabled = true;
+    }
+
+    var selectedAnswerIndex = document.querySelector(
+      'input[name="respuesta"]:checked'
+    ).value;
+    var correctAnswerIndex = triviaData[
+      currentQuestionIndex
+    ].respuestas.findIndex(function (respuesta) {
+      return respuesta.correcta;
+    });
+
+    if (parseInt(selectedAnswerIndex) === correctAnswerIndex) {
+      // Respuesta correcta: aumenta el puntaje
+      puntaje++;
+      document.getElementById("success-animation").style.display = "block";
+    } else {
+      // Respuesta incorrecta
+      document.getElementById("failure-animation").style.display = "block";
+    }
+
+    // Desactiva el botón "Comprobar respuesta"
+    document.getElementById("check-answer").disabled = true;
+    document.getElementById("next-question").style.display = "block";
+  }
+
+  document
+    .getElementById("check-answer")
+    .addEventListener("click", checkAnswer);
+
+  document
+    .getElementById("next-question")
+    .addEventListener("click", function () {
+      currentQuestionIndex++;
+
+      document.getElementById("success-animation").style.display = "none";
+      document.getElementById("failure-animation").style.display = "none";
+
+      if (currentQuestionIndex < triviaData.length) {
+        loadQuestion(currentQuestionIndex);
+        document.getElementById("result").innerHTML = "";
+        document.getElementById("check-answer").disabled = false;
+        document.getElementById("next-question").style.display = "none";
+      } else {
+        document.getElementById("question-alert").textContent =
+          "¡Trivia completada!";
+        document.getElementById("answers").innerHTML =
+          '<div class="alert alert-info">Puntaje: ' +
+          puntaje + // Muestra el puntaje obtenido
+          "/" +
+          triviaData.length +
+          "</div>";
+        document.getElementById("result").innerHTML =
+          '<div class="alert alert-info">Puntaje: ' +
+          puntaje + // Muestra el puntaje obtenido
+          "/" +
+          triviaData.length +
+          "</div>";
+        document.getElementById("check-answer").style.display = "none";
+        document.getElementById("next-question").style.display = "none";
+      }
+    });
+
+  var triviaForm = document.getElementById("trivia-form");
+  var triviaSelect = document.getElementById("trivia-select");
+  triviaForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    // Obtén el valor seleccionado de la trivia
+    var triviaId = triviaSelect.value;
+
+    // Realiza una solicitud AJAX para obtener los datos de la trivia seleccionada
+    var xhr = new XMLHttpRequest();
+    xhr.open(
+      "GET",
+      "{% url 'obtener_preguntas_respuestas' 0 %}".replace("0", triviaId),
+      true
+    );
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        triviaData = JSON.parse(xhr.responseText);
+
+        // Oculta el formulario de selección de trivia y muestra el juego
+        triviaForm.style.display = "none";
+        document.getElementById("question-alert").style.display = "block";
+        document.getElementById("answers").style.display = "block";
+        document.getElementById("check-answer").style.display = "block";
+
+        // Inicializa el puntaje en 0 al comenzar la trivia
+        puntaje = 0;
+
+        // Oculta el bloque "Selecciona una trivia para comenzar"
+        var triviaStartBlock = document.getElementById("trivia-start-block");
+        triviaStartBlock.style.display = "none";
+
+        // Carga la primera pregunta
+        loadQuestion(currentQuestionIndex);
+      }
+    };
+    xhr.send();
+  });
+</script>
+
+{% endblock %}

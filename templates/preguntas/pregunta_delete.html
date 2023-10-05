@@ -1,13 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="container mt-5">
-    <h1>Eliminar Pregunta</h1>
-    <p>¿Estás seguro de que deseas eliminar esta pregunta?</p>
-    <form method="post">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-danger">Eliminar</button>
-      <a href="{% url 'pregunta-list' %}" class="btn btn-secondary ms-2">Cancelar</a>
-    </form>
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <div class="card">
+        <div class="card-header bg-danger text-white">
+          <h2 class="mb-0">Eliminar Pregunta</h2>
+        </div>
+        <div class="card-body">
+          <p class="mb-4">¿Estás seguro de que deseas eliminar esta pregunta?</p>
+          <form method="post">
+            {% csrf_token %}
+            <div class="text-center">
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+              <a href="{% url 'pregunta-list' %}" class="btn btn-secondary ms-2">Cancelar</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
+</div>
 {% endblock %}

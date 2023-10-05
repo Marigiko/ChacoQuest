@@ -1,13 +1,123 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
+<div class="container mt-5 mb-5">
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h2 class="mb-0">Actualizar Trivia</h2>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="{{ form.titulo.id_for_label }}" class="form-label"
+                >Título de la Trivia</label
+              >
+              {{ form.titulo }}
+            </div>
 
-{% block content %}
-  <div class="container">
-    <h1 class="my-4">Actualizar Trivia</h1>
-    <form method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-      <a href="{% url 'trivia-list' %}" class="btn btn-secondary">Cancelar</a>
-    </form>
+            <div class="mb-3">
+              <label for="{{ form.nivel.id_for_label }}" class="form-label"
+                >Nivel de Dificultad</label
+              >
+              {{ form.nivel }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Preguntas (selecciona hasta 4)</label>
+              <div class="form-check">
+                {% for pregunta in form.preguntas.field.queryset %}
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    name="preguntas"
+                    id="pregunta{{ pregunta.pk }}"
+                    value="{{ pregunta.pk }}"
+                    {%
+                    if
+                    pregunta.pk
+                    in
+                    preguntas_seleccionadas
+                    %}checked{%
+                    endif
+                    %}
+                  />
+                  <label
+                    class="form-check-label"
+                    for="pregunta{{ pregunta.pk }}"
+                    >{{ pregunta.texto }}</label
+                  >
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary">
+                Guardar Cambios
+              </button>
+              <a href="{% url 'trivia-list' %}" class="btn btn-secondary"
+                >Cancelar</a
+              >
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
+</div>
+
+<style>
+  .card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .card-header {
+    background-color: #007bff;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+  }
+</style>
+
+<script>
+  // Script para limitar la selección a 4 checkboxes
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      const checkedCheckboxes = document.querySelectorAll(
+        'input[type="checkbox"]:checked'
+      );
+      if (checkedCheckboxes.length >= 4) {
+        checkboxes.forEach((cb) => {
+          if (!cb.checked) {
+            cb.disabled = true;
+          }
+        });
+      } else {
+        checkboxes.forEach((cb) => {
+          cb.disabled = false;
+        });
+      }
+    });
+  });
+</script>
 {% endblock %}

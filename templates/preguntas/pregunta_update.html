@@ -1,20 +1,74 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="container mt-5">
-    <h1>Actualizar Pregunta</h1>
-    <form method="post">
-      {% csrf_token %}
-      <div class="mb-3">
-        <label for="{{ form.texto.id_for_label }}" class="form-label">Texto de la Pregunta:</label>
-        {{ form.texto }}
+<div class="container mt-5">
+  <h1>Actualizar Pregunta</h1>
+  <form method="post" class="mb-5">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="{{ form.texto.id_for_label }}" class="form-label">Texto de la Pregunta:</label>
+      {{ form.texto }}
+    </div>
+    <div class="mb-3">
+      <label for="{{ form.categoria.id_for_label }}" class="form-label">Categoría:</label>
+      {{ form.categoria }}
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Respuestas (selecciona las respuestas correctas):</label>
+      <div id="selected-answers">
+        {% for respuesta in pregunta.respuestas.all %}
+          <div class="selected-answer">
+            <input type="hidden" name="respuestas" value="{{ respuesta.pk }}">
+            <span>{{ respuesta.texto }}</span>
+            <a href="#" class="remove-answer" data-answerid="{{ respuesta.pk }}">Remove</a>
+          </div>
+        {% endfor %}
       </div>
-      <div class="mb-3">
-        <label for="{{ form.categoria.id_for_label }}" class="form-label">Categoría:</label>
-        {{ form.categoria }}
-      </div>
-      <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-      <a href="{% url 'pregunta-list' %}" class="btn btn-secondary ms-2">Cancelar</a>
-    </form>
-  </div>
+      <select id="id_respuestas" class="form-select mb-2">
+        {% for respuesta in respuestas_disponibles %}
+          <option value="{{ respuesta.pk }}">{{ respuesta.texto }}</option>
+        {% endfor %}
+      </select>
+      <button type="button" class="btn btn-primary add-answer">Agregar Respuesta</button>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    <a href="{% url 'pregunta-list' %}" class="btn btn-secondary ms-2">Cancelar</a>
+  </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $(".add-answer").click(function () {
+      var answerSelect = $("#id_respuestas");
+      var selectedAnswerId = answerSelect.val();
+
+      if (selectedAnswerId) {
+        var selectedAnswerText = $("#id_respuestas option:selected").text();
+        $("#selected-answers").append(
+          '<div class="selected-answer"><input type="hidden" name="respuestas" value="' +
+            selectedAnswerId +
+            '"><span>' +
+            selectedAnswerText +
+            '</span> <a href="#" class="remove-answer" data-answerid="' +
+            selectedAnswerId +
+            '">Remove</a></div>'
+        );
+
+        answerSelect.find('option[value="' + selectedAnswerId + '"]').remove();
+        answerSelect.val(null);
+      }
+    });
+
+    $("#selected-answers").on("click", ".remove-answer", function (e) {
+      e.preventDefault();
+      var answerIdToRemove = $(this).data("answerid");
+      $("input[name='respuestas'][value='" + answerIdToRemove + "']").remove();
+      $(this).closest(".selected-answer").remove();
+      $("#id_respuestas").append('<option value="' + answerIdToRemove + '">' + $(this).prev("span").text() + '</option>');
+    });
+  });
+</script>
+
 {% endblock %}

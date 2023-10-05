@@ -1,36 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <div class="container mt-5">
-    <h1>Detalles de la Pregunta</h1>
-    <table class="table table-bordered">
-      <tbody>
-        <tr>
-          <th scope="row">ID:</th>
-          <td>{{ pregunta.pk }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Texto de la Pregunta:</th>
-          <td>{{ pregunta.texto }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Categoría:</th>
-          <td>{{ pregunta.categoria }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Fecha de Publicación:</th>
-          <td>{{ pregunta.fecha_publicacion }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Cantidad de Respuestas:</th>
-          <td>{{ pregunta.respuesta_set.count }}</td>
-        </tr>
-        <tr>
-          <th scope="row">Cantidad de Respuestas Correctas:</th>
-          <td>{{ pregunta.cant_rtas_ok }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <a href="{% url 'pregunta-list' %}" class="btn btn-primary">Volver a la Lista de Preguntas</a>
-  </div>
+<div class="container mt-5">
+  <h1>Detalles de la Pregunta</h1>
+  <table class="table table-bordered">
+    <tbody>
+      <tr>
+        <th scope="row">ID:</th>
+        <td>{{ pregunta.pk }}</td>
+      </tr>
+      <tr>
+        <th scope="row">Texto de la Pregunta:</th>
+        <td>{{ pregunta.texto }}</td>
+      </tr>
+      <tr>
+        <th scope="row">Categoría:</th>
+        <td>{{ pregunta.categoria }}</td>
+      </tr>
+      <tr>
+        <th scope="row">Fecha de Publicación:</th>
+        <td>{{ pregunta.fecha_publicacion }}</td>
+      </tr>
+      <tr>
+        <th scope="row">Cantidad de Respuestas:</th>
+        <td>{{ pregunta.respuestas.count }}</td>  <!-- Cambiado de respuesta_set.count a respuestas.count -->
+      </tr>
+      <tr>
+        <th scope="row">Cantidad de Respuestas Correctas:</th>
+        <td>{{ pregunta.cant_rtas_ok }}</td>
+      </tr>
+      <tr>
+        <th scope="row">Respuestas:</th>
+        <td>
+          <ul>
+            {% for respuesta in pregunta.respuestas.all %}  <!-- Cambiado de respuesta_set.all a respuestas.all -->
+            <li>{{ respuesta.texto }}</li>
+            {% endfor %}
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <a href="{% url 'pregunta-list' %}" class="btn btn-primary">Volver a la Lista de Preguntas</a>
+</div>
 {% endblock %}
